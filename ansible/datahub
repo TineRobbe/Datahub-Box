@@ -1,7 +1,11 @@
 # This is inventory file for development stage
 
 [datahub]
+<<<<<<< HEAD
 192.168.2.152 ansible_ssh_user=vagrant ansible_ssh_private_key_file=~/Machines/datahub/.vagrant/machines/virtualbox/virtualbox/private_key
+=======
+192.168.2.152 ansible_ssh_pass=vagrant ansible_ssh_user=vagrant
+>>>>>>> 0413e2b2361e00fd499733d3253fee9a1f4b6aef
 
 [localhost]
 localhost ansible_connection=local

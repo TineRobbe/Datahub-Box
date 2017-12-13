@@ -49,28 +49,65 @@ After a few minutes, Packer should tell you the box was generated succesfully.
 You'll find the box file in the `packer/build` directory.
 
 If you want to only build a box for one of the supported virtualization
-platforms (e.g. only build the VMware box), add --only=vmware-iso to the packer
-build command:
+platforms (e.g. only build the Virtualbox box), add --only=virtualbox-iso to   
+the packer build command:
 
 ```
-$ packer build --only=vmware-iso datahub.json
+$ packer build --only=vrtualbox-iso datahub.json
 ```
 
 ## Using built boxes
 
-There's an included Vagrantfile that allows quick testing of the built Vagrant
-boxes. From this same directory, run one of the following commands after
-building the boxes:
+### Configuration
+
+Copy the `default.config.yml` file to `config.yml`. 
 
 ```
-# For VMware Fusion:
-$ vagrant up vmware --provider=vmware_fusion
-
-# For VirtualBox:
-$ vagrant up virtualbox --provider=virtualbox
+$ cp default.config.yml config.yml
 ```
 
-Append these lines to your `/etc/hosts` file:
+Change the variables in the configuration file for your particular setup. 
+Make sure you point the `vagrant_synced_folders` to the directory on the host 
+machine where you installed both an instance of the datahub and Project 
+Blacklight. If you're setup looks like this:
+
+```
+$ cd ~/Projects
+$ ls -lah
+drwxr-xr-x  12 user  staff   408B Oct 24 11:09 .
+drwxr-xr-x  58 user  staff   1.9K Dec  2 16:50 ..
+drwxr-xr-x  20 user  staff   680B Dec  6 14:05 datahub
+drwxr-xr-x  27 user  staff   918B Oct 24 15:59 project-blacklight
+```
+
+the YAML configuration should look like this:
+
+```
+vagrant_synced_folders:
+  # The first synced folder will be used for the default Datahub installation, if
+  # any of the build_* settings are 'true'. By default the folder is set to
+  # the datahub folder.
+  - local_path: /Users/username/Projects
+    destination: /vagrant
+    type: nfs
+create: true
+```
+
+Note: if you change the name of the `datahub` and `project-blacklight` folders, 
+you will have to update the variables in `ansible/group_vars/all/nginx.yml` as 
+well and run the `ansible-playbook` command to update the box with the new 
+settings.
+
+### Using the box
+
+After updating the `config.yml` file, run the following command.
+
+```
+$ vagrant up
+```
+
+Vagrant will automatically update your `/etc/hosts` file with the correct 
+entries. If this hasn't happened, append these lines to your `/etc/hosts` file:
 
 ```
 192.168.1.152   datahub.box      # http://datahub.box
@@ -101,12 +138,14 @@ This box contains Ubuntu 14.04.1 Server (AMD 64) with these packages:
 * Git
 * PHP-FPM 7 (with mongdb extension)
 * Ruby 2.4.1 (with rails and bundler)
-* Perl 5.14.1 (with plenv)
 * Oracle Java 8
 * Nginx
 * MongoDB 3.2
 * Rails 5.0.0
-* Solr 6.4.2
+
+## Credits
+
+
 
 ## Authors
 
